@@ -1,0 +1,73 @@
+server:
+  port: 56700
+spring:
+  application:
+    name: my-zuul
+
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/kytms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    #url: jdbc:mysql://192.168.5.240:3306/kytms?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    jedis:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+    timeout: 50000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:56798/eureka/,http://localhost:56799/eureka/
+  instance:
+    prefer-ip-address: true
+    instance-id: my_zuul8088
+#zuul:       也是配置路由访问的一种方式
+#  routes:
+#    my-system: /system/**
+
+
+#计数器限流纯配置文件
+zuul:
+  routes:
+    jwxt-teacher:
+      path: /teacher/**  #访问的路径
+      service-id: jwxt-business   #访问的服务
+    jwxt-learner:
+      path: /student/**
+      service-id: jwxt-student
+    ignored-services: '*'
+#  ratelimit: #3秒内访问不允许超过 2 次，并且这 2 次请求要小于 5 秒
+#    enabled: true  # 开启限流开关
+#    behind-proxy: true # 开启限流代理
+#    default-policy: #全局限流
+#      limit: 2 #单元时间内置允许访问2次
+#      quota: 5 #单元时间内每个请求不得超过5秒
+#      refresh-interval: 1 #单元时间 3秒
+#      type:
+#        - user
+#        - origin
+#        - url
+#    policies:
+#      jwxt-learner: #特定服务
+#        limit: 4 #单元时间内置允许访问4次
+#        quota: 1 #单元时间内每个请求不得超过5秒
+#        refresh-interval: 1 #单元时间 3秒
+
+
+ribbon:
+  ReadTimeout: 60000
+  ConnectTimeout: 60000
+  eureka:
+    enabled: true
+
+down:
+  service: jwxt-student
